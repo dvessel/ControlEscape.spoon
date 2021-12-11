@@ -20,7 +20,8 @@ function obj:init()
   self.lastModifiers = {}
 
   -- If `control` is held for this long, don't send `escape`
-  local CANCEL_DELAY_SECONDS = 0.150
+  -- 250ms seems to be the sweet spot for me
+  local CANCEL_DELAY_SECONDS = 0.250
   self.controlKeyTimer = hs.timer.delayed.new(CANCEL_DELAY_SECONDS, function()
     self.sendEscape = false
   end)
@@ -30,12 +31,16 @@ function obj:init()
   self.controlTap = hs.eventtap.new({hs.eventtap.event.types.flagsChanged},
     function(event)
       local newModifiers = event:getFlags()
+      -- local keycode = event:getKeyCode()
+      -- local inspectResult = hs.inspect.inspect(keycode)
+      -- print(inspectResult)
 
       -- If this change to the modifier keys does not invole a *change* to the
       -- up/down state of the `control` key (i.e., it was up before and it's
       -- still up, or it was down before and it's still down), then don't take
       -- any action.
       if self.lastModifiers['ctrl'] == newModifiers['ctrl'] then
+        -- print("this key is not fucking ctrl")
         return false
       end
 
@@ -46,12 +51,15 @@ function obj:init()
         self.lastModifiers = newModifiers
         self.sendEscape = true
         self.controlKeyTimer:start()
+        -- print("ctrl is pressed/released waiting for next modi")
       else
         if self.sendEscape then
           hs.eventtap.keyStroke({}, 'escape', 1)
+          -- print("escape is called")
         end
         self.lastModifiers = newModifiers
         self.controlKeyTimer:stop()
+        -- print("prev modi is ctrl")
       end
       return false
     end
