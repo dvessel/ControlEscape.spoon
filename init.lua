@@ -21,7 +21,7 @@ function obj:init()
 
   -- If `control` is held for this long, don't send `escape`
   -- 250ms seems to be the sweet spot for me
-  local CANCEL_DELAY_SECONDS = 0.250
+  local CANCEL_DELAY_SECONDS = 0.225
   self.controlKeyTimer = hs.timer.delayed.new(CANCEL_DELAY_SECONDS, function()
     self.sendEscape = false
   end)
