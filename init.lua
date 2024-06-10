@@ -48,19 +48,23 @@ function obj:init()
       -- timer. If the `control` key changes to the up state before the timer
       -- expires, then send `escape`.
       if not self.lastModifiers['ctrl'] then
-        self.lastModifiers = newModifiers
         self.sendEscape = true
         self.controlKeyTimer:start()
         -- print("ctrl is pressed/released waiting for next modi")
       else
         if self.sendEscape then
-          hs.eventtap.keyStroke({}, 'escape', 1)
+          self.lastModifiers['ctrl'] = nil
+          local passthruModifiers={}
+          for m in pairs(self.lastModifiers) do
+            table.insert(passthruModifiers, m)
+          end
+          hs.eventtap.keyStroke(passthruModifiers, 'escape', 1)
           -- print("escape is called")
         end
-        self.lastModifiers = newModifiers
         self.controlKeyTimer:stop()
         -- print("prev modi is ctrl")
       end
+      self.lastModifiers = newModifiers
       return false
     end
   )
